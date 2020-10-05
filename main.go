@@ -17,7 +17,6 @@ var (
 	MAX_FOLLOW_THROUGH	int = 3   // -1 for all
 	MAX_DEPTH			int = 3   // negative for infinite crawling (not recommended)
 	REPOSITORY_PATH		string = "./repository/"
-	channel				chan string = make(chan string)
 	counter				SafeCounter = SafeCounter{ count: 1 }
 	logger				*log.Logger = log.New(os.Stdout, "[GRAWL] ", log.Lshortfile)
 )
@@ -59,7 +58,6 @@ func find_urls(page string) []string {
 func crawl(url string, depth int, treatments []SaveFunc) {
 	counter.SafeInc()
 	str := fmt.Sprintf("Crawling: %s | count: %d", url, counter.SafeCount())
-	//channel <- str
 	logger.Println(str)
 	resp, err := http.Get(url);
 	if err != nil {
@@ -93,17 +91,6 @@ func StartCrawl(starts []string, treatments ...SaveFunc) {
 	wg.Wait()
 }
 
-func PrintResults() {
-	for {
-		select {
-		case c := <- channel:
-			fmt.Println(c)
-		default:
-			continue
-		}
-	}
-}
-
 func Save(p *Page) {
 	u, err := url.ParseRequestURI(p.url)
 	if err != nil {
@@ -135,5 +122,4 @@ func Save(p *Page) {
 
 func main() {
 	StartCrawl(os.Args[1:], Save)
-	PrintResults()
 }
