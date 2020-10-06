@@ -14,11 +14,13 @@ import (
 )
 
 var (
-	MAX_FOLLOW_THROUGH	int = 3   // -1 for all
+	MAX_FOLLOW_THROUGH	int = -1   // -1 for all
 	MAX_DEPTH			int = 3   // negative for infinite crawling (not recommended)
 	REPOSITORY_PATH		string = "./repository/"
 	counter				SafeCounter = SafeCounter{ count: 1 }
+	mutex				sync.Mutex
 	logger				*log.Logger = log.New(os.Stdout, "[GRAWL] ", log.Lshortfile)
+	wg sync.WaitGroup
 )
 
 type SafeCounter struct {
@@ -70,17 +72,22 @@ func crawl(url string, depth int, treatments []SaveFunc) {
 	if depth > 0 {
 		strings := find_urls(string(body))
 		for i := 0; i < len(strings); i++ {
-			go crawl(strings[i], depth - 1, treatments)
+			wg.Add(1)
+			go func (s string) {
+				crawl(s, depth - 1, treatments)
+				wg.Done()
+			} (strings[i])
 		}
 	}
 
 	for _, t := range treatments {
+		mutex.Lock()
 		t(&p)
+		mutex.Unlock()
 	}
 }
 
 func StartCrawl(starts []string, treatments ...SaveFunc) {
-	var wg sync.WaitGroup
 	for _, str := range starts {
 		wg.Add(1)
 		go func (s string) {
@@ -113,11 +120,15 @@ func Save(p *Page) {
 	}
 
 	name += fmt.Sprintf("-%s", time.Now().Format("2-Jan-2006-15:04:05.000"))
-	_, err = os.Create(str + "/" + name)
+	f, err := os.Create(str + "/" + name)
 	if err != nil {
 		logger.Panic(err)
 	}
+
 	logger.Printf("Created dir: %s/%s\n", str, name)
+
+	f.Write(p.body)
+	f.Close()
 }
 
 func main() {
