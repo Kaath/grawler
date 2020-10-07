@@ -6,12 +6,6 @@ Not much really.
 
 ## Usage
 
-### As a binary
-
-```
-./grawler <urls...>
-```
-
 ### As a library
 
 ```
