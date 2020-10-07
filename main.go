@@ -91,7 +91,7 @@ func StartCrawl(starts []string, treatments ...SaveFunc) {
 	for _, str := range starts {
 		wg.Add(1)
 		go func (s string) {
-			crawl(str, MAX_DEPTH, treatments)
+			crawl(s, MAX_DEPTH, treatments)
 			wg.Done()
 		} (str)
 	}
