@@ -1,4 +1,4 @@
-module github.com/grawler
+module github.com/Kaath/grawler
 
 go 1.15
 
