@@ -38,8 +38,6 @@ func (s *SafeCounter) SafeInc() {
     s.mutex.Unlock()
 }
 
-type SaveFunc func(page *Page)
-
 func find_urls(page string) []string {
 	reg := regexp.MustCompile("https?://\"?.*?(>|\"| |\\\\)")
 	res := reg.FindAllString(page, MAX_FOLLOW_THROUGH)

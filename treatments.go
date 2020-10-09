@@ -13,6 +13,8 @@ type Page struct {
 	body []byte
 }
 
+type SaveFunc func(page *Page)
+
 func Save(p *Page) {
 	u, err := url.ParseRequestURI(p.url)
 	if err != nil {
@@ -36,6 +38,7 @@ func Save(p *Page) {
 
 	name += fmt.Sprintf("-%s", time.Now().Format("2-Jan-2006-15:04:05.000"))
 	f, err := os.Create(str + "/" + name)
+	defer f.Close()
 	if err != nil {
 		logger.Panic(err)
 	}
@@ -43,5 +46,4 @@ func Save(p *Page) {
 	logger.Printf("Created dir: %s/%s\n", str, name)
 
 	f.Write(p.body)
-	f.Close()
 }
