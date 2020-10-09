@@ -41,11 +41,12 @@ func (s *SafeCounter) SafeInc() {
 type SaveFunc func(page *Page)
 
 func find_urls(page string) []string {
-	reg := regexp.MustCompile("https?://[^\" \\>]*( |\"|\\|>)")
+	reg := regexp.MustCompile("https?://\"?.*?(>|\"| |\\\\)")
 	res := reg.FindAllString(page, MAX_FOLLOW_THROUGH)
 	for index, str := range res {
 		res[index] = str[:len(str) - 1]
 	}
+
 	return res
 }
 
