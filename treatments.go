@@ -9,7 +9,7 @@ import (
 )
 
 type Page struct {
-	url string
+	url  string
 	body []byte
 }
 
@@ -33,7 +33,7 @@ func Save(p *Page) {
 		name = "default.html"
 	} else {
 		tmp := strings.Split(u.Path, "/")
-		name = tmp[len(tmp) - 1]
+		name = tmp[len(tmp)-1]
 	}
 
 	name += fmt.Sprintf("-%s", time.Now().Format("2-Jan-2006-15:04:05.000"))
